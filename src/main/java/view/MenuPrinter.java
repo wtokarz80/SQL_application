@@ -20,4 +20,14 @@ public class MenuPrinter {
                 + "0 - Back to previous menu\n");
     }
 
+    public void printApplicantMenu() {
+        System.out.println("Menu:\n"
+
+                + "1 - Change first name\n"
+                + "2 - Change last name\n"
+                + "3 - Change phone_number\n"
+                + "4 - Change email\n"
+                + "5 - Change application code\n"
+                + "0 - Back to previous menu\n");
+    }
 }

@@ -22,41 +22,49 @@ public class MenuController {
     MenuPrinter menuPrinter = new MenuPrinter();
     InputProvider inputProvider = new InputProvider();
 
-    public void menu() throws IOException {
-        menuPrinter.printUserMenu();
+    public void menuProvider() throws IOException {
+
         boolean isRun = true;
         while (isRun) {
+            menuPrinter.printUserMenu();
             int userChoice = inputProvider.getNumberFromUser("Enter option: ");
             switch (userChoice) {
                 case 1:
-                    getMentorsFullNames();
+                    mentorService.initializeMentorsFullNames();
                     break;
                 case 2:
-                    getMentorsNickName();
+                    mentorService.initializeMentorsNickName(inputProvider);
                     break;
                 case 3:
-                    getApplicantsFullName();
+                    applicantService.initializeApplicantsFullName(inputProvider);
                     break;
                 case 4:
-                    getApplicantByEmailEnding();
+                    applicantService.initializeApplicantByEmailEnding(inputProvider);
                     break;
                 case 5:
-                    getApplicantByApplicationCode();
+                    applicantService.initializeApplicantByApplicationCode(inputProvider);
                     break;
                 case 6:
-                    initializeGetApplicantByFullName();
+                    applicantService.initializeGetApplicantByFullName(inputProvider);
                     break;
                 case 7:
-                    initializeGetApplicantByDomain();
+                    applicantService.initializeGetApplicantByDomain(inputProvider);
                     break;
                 case 8:
-                    initializeDeleteApplicantByDomain();
+                    applicantService.initializeDeleteApplicantByDomain(inputProvider);
                     break;
                 case 9:
-                    initializeAddApplicant();
+                    applicantService.initializeAddApplicant(inputProvider);
                     break;
                 case 10:
-                    initializeGetAllApplicants();
+                    applicantService.initializeGetAllApplicants(inputProvider);
+                    break;
+                case 11:
+                    mentorService.initializeSearchInMentorsByPhrase(inputProvider);
+                    applicantService.initializeSearchInApplicantsByPhrase(inputProvider);
+                    break;
+                case 12:
+                    applicantMenuProvider();
                     break;
                 case 0:
                     isRun = false;
@@ -66,71 +74,67 @@ public class MenuController {
         }
     }
 
-    private void initializeGetAllApplicants() {
-        List<Applicant> allApplicantsData = applicantService.getAllApplicantsData();
-        applicantService.initializeApplicantPrinting(allApplicantsData);
+    private void applicantMenuProvider() throws IOException {
+        applicantService.initializeGetAllApplicants(inputProvider);
+        List<Applicant> applicants = applicantService.initializeApplicantById(inputProvider);
+        int applicantId = applicants.get(0).getIdUser();
+        boolean isRun = true;
+        while (isRun) {
+            menuPrinter.printApplicantMenu();
+            int userChoice = inputProvider.getNumberFromUser("Enter option: ");
+            switch (userChoice) {
+                case 1:
+                    changeFirstName(applicantId);
+                    break;
+                case 2:
+                    changeLastName(applicantId);
+                    break;
+                case 3:
+                    changePhoneNumber(applicantId);
+                    break;
+                case 4:
+                    changeEmail(applicantId);
+                    break;
+                case 5:
+                    changeApplicationCode(applicantId);
+                    break;
+                case 0:
+                    isRun = false;
+                default:
+                    break;
+            }
+        }
     }
 
-    private void initializeAddApplicant() throws IOException {
-        String applicantFirstName = inputProvider.takeStringInput("Enter first name of the applicant: ");
-        String applicantLastName = inputProvider.takeStringInput("Enter last name of the applicant: ");
-        String applicantPhoneNumber = inputProvider.takeStringInput("Enter phone number of the applicant: ");
-        String applicantEmail = inputProvider.takeStringInput("Enter email of the applicant: ");
-        int applicantCode = inputProvider.getNumberFromUser("Enter application code of the applicant: ");
-        Applicant applicant = new Applicant();
-        applicant.setFirstName(applicantFirstName);
-        applicant.setLastName(applicantLastName);
-        applicant.setPhoneNumber(applicantPhoneNumber);
-        applicant.setEmail(applicantEmail);
-        applicant.setApplicationCode(applicantCode);
-        this.applicantService.addApplicantToDb(applicant);
+    private void changeApplicationCode(int applicantId) {
+        int newApplicationCode = inputProvider.getNumberFromUser("Enter a new application code: ");
+        applicantService.initializeUpdateApplicant(applicantId, "application_code", Integer.toString(newApplicationCode));
+        applicantService.initializeApplicantPrinting(applicantService.getApplicantById(applicantId));
     }
 
-    private void initializeDeleteApplicantByDomain() throws IOException {
-        String userDomain = "%" + inputProvider.takeStringInput("Enter domain of the applicants: ");
-        applicantService.deleteByDomain(userDomain);
+    private void changeEmail(int applicantId) throws IOException {
+        String newEmail = inputProvider.takeStringInput("Enter a new email: ");
+        applicantService.initializeUpdateApplicant(applicantId, "email", newEmail);
+        applicantService.initializeApplicantPrinting(applicantService.getApplicantById(applicantId));
     }
 
-    private void initializeGetApplicantByDomain() throws IOException {
-        String userFirstName = inputProvider.takeStringInput("Enter first name of the applicant: ");
-        String userLastName = inputProvider.takeStringInput("Enter last name of the applicant: ");
-        String[] fullName = {userFirstName, userLastName};
-        List<Applicant> applicantList = this.applicantService.getApplicantByFullName(fullName);
-        this.applicantService.initializeApplicantPrinting(applicantList);
+    private void changePhoneNumber(int applicantId) throws IOException {
+        String newPhoneNumber = inputProvider.takeStringInput("Enter a new phone number: ");
+        applicantService.initializeUpdateApplicant(applicantId, "phone_number", newPhoneNumber);
+        applicantService.initializeApplicantPrinting(applicantService.getApplicantById(applicantId));
     }
 
-    private void initializeGetApplicantByFullName() throws IOException {
-        String firstName = inputProvider.takeStringInput("Enter first name of the applicant: ");
-        String lastName = inputProvider.takeStringInput("Enter last name of the applicant: ");
-        String newPhoneNumber = inputProvider.takeStringInput("Enter new phone number of the applicant: ");
-        String[] fullNameToUpdatePhone = {firstName, lastName};
-        String[] elementsToUpdate = {newPhoneNumber};
-        List<Applicant> applicantListToUpdate = this.applicantService.getApplicantByFullName(fullNameToUpdatePhone);
-        this.applicantService.updatePhoneByFullName(applicantListToUpdate, elementsToUpdate);
+    private void changeLastName(int applicantId) throws IOException {
+        String newLastName = inputProvider.takeStringInput("Enter a new last name: ");
+        applicantService.initializeUpdateApplicant(applicantId, "last_name", newLastName);
+        applicantService.initializeApplicantPrinting(applicantService.getApplicantById(applicantId));
     }
 
-    private void getApplicantByEmailEnding() throws IOException {
-        String userEmailEnding = "%" + inputProvider.takeStringInput("Enter email ending of the applicant: ");
-        this.applicantService.getFullNameByUserEmail(userEmailEnding);
+    private void changeFirstName(int applicantId) throws IOException {
+        String newName = inputProvider.takeStringInput("Enter a new name: ");
+        applicantService.initializeUpdateApplicant(applicantId, "first_name", newName);
+        applicantService.initializeApplicantPrinting(applicantService.getApplicantById(applicantId));
     }
 
-    private void getApplicantsFullName() throws IOException {
-        String userName = inputProvider.takeStringInput("Enter name of the applicant: ");
-        this.applicantService.getFullNameByUserName(userName);
-    }
 
-    private void getMentorsNickName() throws IOException {
-        String city = inputProvider.takeStringInput("Enter name of the city: ");
-        this.mentorService.displayMentorNickNames(city);
-    }
-
-    private void getMentorsFullNames() {
-        this.mentorService.getFirstNameLastNameAllMentors();
-    }
-
-    private void getApplicantByApplicationCode(){
-        int userCode = inputProvider.getNumberFromUser("Enter application code: ");
-        List<Applicant> applicantList = this.applicantService.getApplicantByCode(userCode);
-        this.applicantService.initializeApplicantPrinting(applicantList);
-    }
 }

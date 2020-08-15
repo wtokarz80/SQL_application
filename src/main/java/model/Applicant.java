@@ -11,6 +11,8 @@ public class Applicant extends User{
 
     public Applicant(){}
 
+    public Applicant(String firstName, String lastName, String phoneNumber, String email, int applicationCode){}
+
     public int getApplicationCode() {
         return applicationCode;
     }
@@ -29,9 +31,6 @@ public class Applicant extends User{
 
     @Override
     public String toString() {
-        return "Applicant{" +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", fullName='" + fullName + '\'' +
-                '}';
+        return  idUser + ", " + firstName + " " + lastName + ", " + phoneNumber + ", " + email + ", " + applicationCode;
     }
 }

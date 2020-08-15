@@ -50,10 +50,27 @@ public class ApplicantDbDAO extends PostgreSQLJDBC implements IApplicantDAO<Appl
         updateDB(query);
     }
 
+    @Override
+    public void updateApplicant(int id, String columnName, String newValue) {
+        String query;
+        if (columnName.equals("application_code")){
+            int value = Integer.parseInt(newValue);
+            query = String.format("UPDATE applicants SET %s=%d WHERE id=%d;",columnName, value, id);
+            System.out.println("dupa");
+        } else {query = String.format("UPDATE applicants SET %s='%s' WHERE id=%d;",columnName, newValue, id);}
+        updateDB(query);
+    }
+
 
     @Override
     public List<Applicant> getApplicantDataByCode(int code) {
         String query = String.format("SELECT * FROM applicants WHERE application_code='%d';",code);
+        return applicantsList(query);
+    }
+
+    @Override
+    public List<Applicant> getApplicantDataById(int id) {
+        String query = String.format("SELECT * FROM applicants WHERE id=%d;",id);
         return applicantsList(query);
     }
 
@@ -64,6 +81,12 @@ public class ApplicantDbDAO extends PostgreSQLJDBC implements IApplicantDAO<Appl
         return applicantsList(query);
     }
 
+    @Override
+    public List<Applicant> getRecordsByPhrase(String phrase) {
+        String query = String.format("SELECT * FROM applicants WHERE first_name LIKE '%1$s' OR last_name LIKE '%1$s' OR phone_number LIKE '%1$s' " +
+                "OR email LIKE '%1$s';", phrase);
+        return applicantsList(query);
+    }
 
     private List<Applicant> applicantsList(String query) {
         List<Applicant> applicantFullName = new ArrayList<>();
@@ -103,6 +126,7 @@ public class ApplicantDbDAO extends PostgreSQLJDBC implements IApplicantDAO<Appl
         }
         System.out.println("Operation done successfully");
     }
+
 
 
 }

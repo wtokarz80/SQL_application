@@ -6,7 +6,7 @@ public class Mentor extends User{
     String city;
     int favouriteNumber;
 
-    public Mentor(int idUser, String firstName, String lastName, String phoneNumber, String email, String nickName, String city, int favouriteNumber) {
+    public Mentor(int idUser, String firstName, String lastName, String nickName, String phoneNumber, String email, String city, int favouriteNumber) {
         super(idUser, firstName, lastName, phoneNumber, email);
         this.nickName = nickName;
         this.city = city;
